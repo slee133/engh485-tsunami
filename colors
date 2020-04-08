@@ -1,0 +1,42 @@
+The general style sheet I tried to abide by.
+
+Headings:
+Font - sans-serif (20pt for document; 30px for webpage headers; 40px for main webpage header)
+Color - 
+  web: #000000
+  document: #000000
+
+Body:
+Font - Georgia (12pt for document; 14px for webpage)
+Color-  
+  web: #343E3D
+  document: #000000
+
+
+Plots:
+Font - sans-serif (14pt)
+Color -
+  text: '#08427B'
+  bar fill-color: "#A2C4EF"
+  bar-border: "#4E148C" 
+
+Navigational Tabs (webpage only):
+Font - Georgia (20px)
+Color - 
+  color: #000000;
+  background-color: #fff;
+  border-color: #1A1658;
+
+
+
+Where I got the colors?
+scheme maker: https://coolors.co/f1e3f3-c2bbf0-6665dd-473bf0-343e3d 
+& https://coolors.co/f1e3f3-91a6ff-247ba0-473bf0-343e3d
+light barblue: #4E148C
+blue-gray: #c2bbf0
+blueblue: #473bf0
+darkstrongblue: #1A1658
+darkgray: #343e3d
+
+black: #000000
+white: #fff

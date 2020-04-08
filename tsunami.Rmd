@@ -1,0 +1,150 @@
+---
+title: "Something about Tsunamis"
+author: "Su-Ah Lee"
+output: 
+  html_document:
+    toc: true
+    css: style.css
+---
+```{r,  include=FALSE}
+#look at this
+#library(ggmap)
+#library(maps)
+#library(mapdata)
+#library(sf)
+
+#maps in r
+#https://eriqande.github.io/rep-res-web/lectures/making-maps-with-R.html 
+
+#shapefiles
+#https://datacarpentry.org/r-raster-vector-geospatial/06-vector-open-shapefile-in-r/
+
+```
+
+# Introduction
+The objective of this is to eventually create a ShinyApp for my English Class. I used tsuanmi data from hifild. 
+
+Tsunamis are super-interesting, because unlike other natural disasters, they are nearly impossible to track. For the most part, we are able to track how tectnotic plates move, and then as a result, predict tsunamis. 
+
+## Data Sources: 
+The Tsunami data is from: https://hifld-geoplatform.opendata.arcgis.com/datasets/historical-tsunami-event-locations
+
+## Tutorials:
+The tutorials I went through to make the Shiny App:
+https://shiny.rstudio.com/tutorial/written-tutorial/lesson1/ 
+https://rmarkdown.rstudio.com/authoring_shiny_prerendered.html#overview 
+https://bookdown.org/weicheng/shinyTutorial/ 
+
+There was a lot of overlap between them, but having the different tutorials to go through was really helpful in seeing the depth of the knowledge. I tried to finish them by the end of March so that I'll have majority of the general knowledge to make the app. As it would turn out, Spring Break was a ride and I got delayed (among other things). 
+
+Tutorials for Leaflet (Map):
+https://rstudio.github.io/leaflet/ 
+
+I've had some background in Leaflet, but not in R. I've used Leaflet in JS (very sad experience), so I had a lot of trouble breaking out of old habits.
+
+Importing the libraries and defining the dataset names so we can refer to it.
+```{r,  include=FALSE}
+#for visalization of the markdown document
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+
+#for the data/code
+library(rmarkdown)
+library(tidyr)
+library(tidyverse)
+#for the graphs
+library(plotly)
+library(ggplot2)
+library(gapminder)
+#for the map
+library(leaflet)
+library(leaflet.extras)
+
+#read in tsunami data
+tsunami <- read.csv("Tsunami.csv")
+
+#data cleaning:
+
+#looking only at data from 2000 on
+tsun <- tsunami[which(tsunami$YEAR>= 2000),]
+
+t <- list( #making the default font for the plots
+    family = "Georgia", size = 14, color = '#08427B')
+```
+
+# Map of all Recorded Tsunamis
+
+This is a map of all the tsunamis that have ever been recorded. They are grouped by regions. Hovering over the numerical points will show the amount of tsunamis are in that area. Blue points are the actual tsunami points, or their origin point. 
+Interaction of the blue points will show the year that the tsunami is recorded to occur. 
+
+```{r Map of Tsunamis}
+map <- leaflet(tsunami) %>% 
+  addTiles(group = "OSM(default)") %>%
+  addProviderTiles(providers$CartoDB.Positron, group = "B&W") %>%
+  addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>%
+  # Overlay groups
+  addCircles( ~LONGITUDE, ~LATITUDE, radius = tsunami$EQ_MAGNITUDE, stroke = F, group = "Quakes") %>%
+  addCircleMarkers(
+    ~LONGITUDE, ~LATITUDE, label = c("Year: ", tsunami$YEAR), #the placement
+    clusterOptions = markerClusterOptions(), #the cluster 
+    radius = (6), color = "blue", stroke = FALSE, fillOpacity = 0.5, group = "Grouped (default)") %>% #marker style
+  # Layers control
+  addLayersControl(
+    baseGroups = c("OSM (default)", "B&W", "Toner Lite"),
+    overlayGroups = c("Quakes", "Grouped (default)"),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+  
+  addResetMapButton()
+
+map
+```
+
+# Magnitude Frequency of All Recorded Tsunamis
+Here's a barplot of the frequency of mangnitude of all the tsunamis.
+
+```{r Magnitude Frequency}
+#overall
+totMagC = table(tsunami$EQ_MAGNITUDE)
+totmc = as.data.frame(totMagC)
+magFig <- plot_ly( x = totmc$Var1, y = totmc$Freq, type = "bar",
+                   marker = list(color = "#A2C4EF", 
+                                   line = list(color = "#4E148C", width = 1.5)))
+magFig <- magFig %>% layout(title = "Magnitude Frequency of Tsunamis", font = t,
+         xaxis = list(title = "Magnitude"),
+         yaxis = list(title = "Frequency"))
+
+magFig
+```
+
+# Magnitude Frequency since 2020
+
+```{r MagFre20}
+#last 20 years
+magnitudeCount = table(tsun$EQ_MAGNITUDE)
+mc = as.data.frame(magnitudeCount)
+magfig20 <- plot_ly( x = mc$Var1, y = mc$Freq, type = "bar", text = c(mc$Freq),
+                     marker = list(color = "#A2C4EF", 
+                                   line = list(color = "#4E148C", width = 1.5)))
+magfig20 <- magfig20 %>% layout(title = "Magnitude Frequency of Tsunamis in the Past 20 Years", font = t, xaxis = list(title = "Magnitude"), yaxis = list(title = "Frequency"))
+magfig20
+```
+
+# Tsunami By Year
+There's an on-going debate that climate change and global warming is causing more natural disasters to occur in the world. The end of the industrial revolution was about 1820-1840. 
+
+```{r Tsunami by Year}
+tsunami$EQ_MAGNITUDE[is.na(tsunami$EQ_MAGNITUDE)] <- 1
+data <- tsunami[which(tsunami$EQ_MAGNITUDE > 0),]
+yrct = table(sort(tsunami$YEAR))
+yr = as.data.frame(yrct)
+yrmap <- plot_ly( x = yr$Var1, y = yr$Freq, type = "bar", text = c(yr$Freq),
+                     marker = list(color = "#A2C4EF", 
+                                   line = list(color = "#4E148C", width = 1.5)))
+yrmap <- yrmap %>% layout(title = "Tsunami Frequency by Year", font = t,
+         xaxis = list(title = "Year"),
+         yaxis = list(title = "Frequency")) 
+  
+yrmap
+
+```
+

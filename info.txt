@@ -1,0 +1,3 @@
+Learning how to code is more about making something, so I dove into this project with the intention of doing just that. More than learning, I spent more time trying to debug this code.
+
+In the middle of the project, I realized that making the entire document prettier is all CSS. Which was great. Wonderful even. So, I rolled up my sleeves and did some quick tutorials to remember how to code in CSS. Needless to say, there's a lot to improve on.
